@@ -1,0 +1,57 @@
+
+
+// for all unique edges in adjMatrix
+//	push to heap //example (x,y,weight) balance based off weight
+
+for x=0 to X 
+    for y=x+1 to Y
+        push (x,y, weight[x,y]) onto heap
+	
+
+S1 = []//S is an array of visited vertices
+S2 = []
+S3 = []
+
+exiledEdges = [null, null]
+totalWeight_1st = 0
+totalWeight_2nd = 0
+totalWeight_3rd = 0
+
+//find min_span_tree_1
+for i=1 to heap.size //total_edges (non truncated)
+	pop the smallest off the heap //(x,y,weight)
+	if !(x contained in S1 && y contained in S1)
+		push (x) onto S1
+		push (y) onto S1
+		totalWeight_1st += weight
+	if S1.size = V-1
+		S2.copy(S1)
+        totalWeight_2nd = totalWeight_1st - last_known_weight
+        exiledEdges.push(last_known_weight)
+        break
+
+//find min_span_tree_2
+for i=1 to heap.size //total_edges (heap is truncated now)
+	pop the smallest off the heap //(x,y,weight)
+	if !(x contained in S1 && y contained in S1) && not contained in exiledEdges
+		push (x) onto S2
+		push (y) onto S2
+		totalWeight_2nd += weight
+	if S2.size = V-1
+		S3.copy(S2)
+        totalWeight_3rd = totalWeight_2nd - last_known_weight
+        exiledEdges.push(last_known_weight)
+        break
+
+//find min_span_tree_3
+for i=1 to heap.size //total_edges (heap is truncated again now)
+	pop the smallest off the heap //(x,y,weight)
+	if !(x contained in S1 && y contained in S1) && not contained in exiledEdges
+		push (x) onto S3
+		push (y) onto S3
+		totalWeight_3rd += weight
+        break
+
+print totalWeight_1st
+print totalWeight_2nd
+print totalWeight_3rd
