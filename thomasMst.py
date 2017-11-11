@@ -18,8 +18,13 @@ def prims(graph, V):
       mst.append(newEdge[2])
       weight = weight + newEdge[0]
   print (weight)
-graph = [[0, 1, 9, 9,1], [1, 0, 1, 9, 9], [9, 1, 0, 1, 9], [9, 9, 1, 0, 1], [1, 9, 9, 1, 0]]  
-prims(graph, len(graph) + 1)
+
+#graph = [[0, 1, 9, 9,1], [1, 0, 1, 9, 9], [9, 1, 0, 1, 9], [9, 9, 1, 0, 1], [1, 9, 9, 1, 0]]
+
+fileGraph = [line.rstrip('\n').split(',') for line in open('input.txt','r')]
+totalVertices = int(fileGraph[0][0])
+del fileGraph[0]
+prims(fileGraph, totalVertices)
   
 
   
