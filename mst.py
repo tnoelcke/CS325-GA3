@@ -88,16 +88,15 @@ def findMSTs(graph, V):
         pass
 
     #travel down big branch
-    #redundancy
-    # try:
-    #     heap3BS = deepcopy(heap2BMaster)
-    #     heap3BS.remove(heap2B[0])
-    #     MST3BS = MSTNth(heap3BS,V)
-    #     print(MST3BS)
-    #     if MST3BS[0] >= MST1[0]:
-    #         heappush(memorization,MST3BS[0])
-    # except:
-    #     pass
+    try:
+        heap3BS = deepcopy(heap2BMaster)
+        heap3BS.remove(heap2B[0])
+        MST3BS = MSTNth(heap3BS,V)
+        print(MST3BS)
+        if MST3BS[0] >= MST1[0]:
+            heappush(memorization,MST3BS[0])
+    except:
+         pass
     
     try:
         heap3BB = deepcopy(heap2BMaster)
