@@ -1,75 +1,124 @@
 #!/usr/bin/env python3
 
 import heapq
-from heapq import heappush, heappop
+from heapq import heappush, heappop, heapify
+import copy
+from copy import deepcopy
 
-heap = []
-
-
-
-def MSTNth(heap, S, ExiledEdges, V, weight):
+def MSTNth(heap, V):
     #find MST based on input variable. Exiled Edges will cause us to find the nth MST where n is the
     #number of exiled edges.
-
+    weight = 0
+    S = []
+    ExiledEdges = []
     for i in range(0, len(heap)):
         safeEdge = heappop(heap)
-
-
-
-        if not(safeEdge[1] in S and safeEdge[2] in S) and (safeEdge not in ExiledEdges):
-            S.append(safeEdge[1])
-            S.append(safeEdge[2])
+        if not(safeEdge[1] in S and safeEdge[2] in S):
+            if(safeEdge[1] not in S): S.append(safeEdge[1])
+            if(safeEdge[2] not in S): S.append(safeEdge[2])
             weight = weight + safeEdge[0]
-        if len(S) == (V - 1):
-            ExiledEdges.append(safeEdge)
-            S.remove(safeEdge[1])
-            S.remove(safeEdge[2])
-            #this looks weird but it allows me to pass the actual weight for the MST and the
-            #weight minus the last edge. This will come in handy later.
-            break
-    print(S)
-    return (weight, weight - safeEdge[0])
-      
+            if len(S) == (V):
+                ExiledEdges.append(safeEdge) #push largest edge onto Exiled Edges
+                break
+    return (weight, ExiledEdges)
 
-
-def findMST(graph, V):
+def buildHeap(graph):
+    heap = []
     # load up the values. We will replace reading the graph with file IO later.
     for i in range(0, len(graph)):
         for j in range(i + 1, len(graph[i])):
             heappush(heap, (int(graph[i][j]), int(i), int(j)))
-
     #print(heap)
+    return heap
 
-    S1 = []
-    S2 = []
-    S3 = []
-  
-    exiledEdges = []
-    totalWeight1 = 0
-    totalWeight2 = 0
-    totalWeight3 = 0
+def findMSTs(graph, V):
+    heapMaster = buildHeap(graph)
+    memorization = []
 
     #find MST1
-    print(MSTNth(heap, S1, exiledEdges, V, totalWeight1) )
-#   print("weight: ",totalWeight1)
-#   print(S1)
-#   #find MST2
-#   S2.append(S1)
-#   (totalWeight2, totalWeight3) = MSTNth(heap, S2, exiledEdges, V, totalWeight2)
-#   print(totalWeight2)
-#   S3.append(S3)
-#   (totalWeight3, temp) = MSTNth(heap, exiledEdges, V, exiledEdges, totalWeight3)
-#   print(totalWeight3)
-  
-  
-  #findMST3
-  
-  
-  
-#graph = [[ 1, 2, 3], [4, 5], [6], []]
+    heap1 = deepcopy(heapMaster)
+    MST1 = MSTNth(heap1, V)
+    heappush(memorization,MST1[0])
 
+    #find MST2
+    #small branch
+    try:
+        heap2S = deepcopy(heapMaster)
+        heap2S.remove(heap2S[0])
+        heap2SMaster = deepcopy(heap2S)
+        MST2S = MSTNth(heap2S,V)
+        print(MST2S)
+        if MST2S[0] >= MST1[0]:
+            heappush(memorization,MST2S[0])
+    except:
+        pass
+
+    #big branch
+    try:
+        heap2B = deepcopy(heapMaster)
+        heap2B.remove(MST1[1][0])
+        heap2BMaster = deepcopy(heap2B)
+        MST2B = MSTNth(heap2B, V)
+        print(MST2B)
+        if MST2B[0] >= MST1[0]:
+            heappush(memorization,MST2B[0])
+    except:
+        pass
+
+    #find MST3
+    #travel down small branch
+    try:
+        heap3SS = deepcopy(heap2SMaster)
+        heap3SS.remove(heap2S[0])
+        MST3SS = MSTNth(heap3SS,V)
+        print(MST3SS)
+        if MST3SS[0] >= MST1[0]:
+            heappush(memorization,MST3SS[0])
+    except:
+        pass
+    
+    try:
+        heap3SB = deepcopy(heap2SMaster)
+        heap3SB.remove(MST2S[1][0])
+        MST3SB = MSTNth(heap3SB,V)
+        print(MST3SB)
+        if MST3SB[0] >= MST1[0]:
+            heappush(memorization,MST3SB[0])
+    except:
+        pass
+
+    #travel down big branch
+    #redundancy
+    # try:
+    #     heap3BS = deepcopy(heap2BMaster)
+    #     heap3BS.remove(heap2B[0])
+    #     MST3BS = MSTNth(heap3BS,V)
+    #     print(MST3BS)
+    #     if MST3BS[0] >= MST1[0]:
+    #         heappush(memorization,MST3BS[0])
+    # except:
+    #     pass
+    
+    try:
+        heap3BB = deepcopy(heap2BMaster)
+        heap3BB.remove(MST2B[1][0])
+        MST3BB = MSTNth(heap3BB,V)
+        print(MST3BB)
+        if MST3BB[0] >= MST1[0]:
+            heappush(memorization,MST3BB[0])
+    except:
+        pass
+
+
+    print(memorization)
+    print(heappop(memorization))
+    print(heappop(memorization))
+    print(heappop(memorization))
+    
+#RUN PROG
 fileGraph = [line.rstrip('\n').split(',') for line in open('input.txt','r')]
 totalVetices = int(fileGraph[0][0])
 del fileGraph[0]
 
-findMST(fileGraph, totalVetices)
+findMSTs(fileGraph, totalVetices)
+#END PROG
