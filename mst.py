@@ -88,6 +88,7 @@ def findMSTs(graph, V):
         pass
 
     #travel down big branch
+	#this is important for some test cases. TCN
     try:
         heap3BS = deepcopy(heap2BMaster)
         heap3BS.remove(heap2B[0])
