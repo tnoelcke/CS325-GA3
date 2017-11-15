@@ -18,7 +18,27 @@ def setUpHeap(graph):
 
 #relabels all the verticies in a graph. This will be nessisary if we are changing a big
 #label to a smaller one and if we are adding together two connected components
-def reLabel(forest, newLabel, oldLabel):
+def reLabel(forest, edge1, edge2):
+	newLabel = 0
+	oldLabel = 0
+	if forest[edge1][0] == -1 and forest[edge2][0] == -1:
+		forest[edge1] = (edge2, forest[edge1][1])
+		forest[edge1] = (edge2, forest[edge2][1])
+		return
+	elif forest[edge1][0] == -1 or forest[edge2][0] == -1:
+		if forest[edge1][0] == -1:
+			forest[edge1] = (edge2, forest[edge1][1])
+			return
+		else:
+			forest[edge2] = (edge2, forest[edge2][1])
+			newEdge = edge2
+			oldEdge = edge1
+	elif forest[edge1][0] > forest[edge2][0]:
+		newLabel = forest[edge2][0]
+		oldLabel = forest[edge1][0]
+	else:  #forest[edge1][0] < forest[edge2][0]
+		newLabel = forest[edge2][0]
+		oldLabel = forest[edge1][0]
 	for i in range(0, len(forest)):
 		if forest[i][0] == oldLabel:
 			forest[i] = (newLabel, forest[i][1])
@@ -41,44 +61,36 @@ def findMst(heap, forest, V):
 	while numEdge < V:
 		safeEdge = heappop(heap)
 		print(safeEdge)
+		
 		#if neither vertex has had any edges added to them.
 		if forest[safeEdge[1]][0] < 0 and forest[safeEdge[2]][0] < 0:
 			#we are adding another edge
 			numEdge = numEdge + 1
 			#label the connected component when it is created
-			forest[safeEdge[1]] = (safeEdge[2], forest[safeEdge[1]][1])
-			forest[safeEdge[2]] = (safeEdge[2], forest[safeEdge[2]][1])
+			reLabel(forest, safeEdge[1], safeEdge[2])
 			#add the edge to the ajacentcy list
 			addEdge(forest, safeEdge[1], safeEdge[2])
 			#add weight
 			weight = weight + safeEdge[0]
+			
 		#if one of the vertex have has not yet had any edges added to it
-		if forest[safeEdge[1]][0] < 0 or forest[safeEdge[2]][0] < 0:
+		elif forest[safeEdge[1]][0] < 0 or forest[safeEdge[2]][0] < 0:
 			#we are adding another edge.
 			numEdge = numEdge + 1
 			addEdge(forest, safeEdge[1], safeEdge[2])
 			weight = weight + safeEdge[0]
-			#add lebel to edge, we are always using the smaller lebel which
-			#the way we have implimented our heap will be the first label
-			if forest[safeEdge[1]][0] < 0:
-				forest[safeEdge[1]] = (safeEdge[2], forest[safeEdge[1]][1])
-			#if a larger label is being changed to a smaller label we need go find that lebal
-			#and ajust it every where it is used.
-			else:
-				#relabel the verticies
-				reLabel(forest, safeEdge[2], safeEdge[1])
-				#add the edge
+			reLabel(forest, safeEdge[1], safeEdge[2])
 				
 				
 		#if both of the edges are part of a connected componet make sure they are not the same connected component.
-		if forest[safeEdge[1]][0] > 0 and forest[safeEdge[2]][0] > 0:
+		elif forest[safeEdge[1]][0] > 0 and forest[safeEdge[2]][0] > 0:
 			#if they are not the same connected componenet connect them otherwise
 			#don't add the edge because we will create a cycle.
 			if forest[safeEdge[1]][0] != forest[safeEdge[2]][0]:
 				#here we are adding another edge
 				numEdge = numEdge + 1
 				#relabel the edges
-				reLabel(forest, safeEdge[2], safeEdge[1])
+				reLabel(forest, safeEdge[1], safeEdge[2])
 				#add the edge
 				addEdge(forest, safeEdge[1], safeEdge[2])
 				#add the weight
