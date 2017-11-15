@@ -37,9 +37,16 @@ def addEdge(forest, edge1, edge2):
 	forest[edge1][1].append(edge2)
 	forest[edge2][1].append(edge1)
 
+#Removes an edege from the graph.
+def removeEdge(graph, toRemove):
+	try:
+		graph[toRemove[1]][1].remove(toRemove[2])
+		graph[toRemove[2]][1].remove(toRemove[1])
+	except:
+		pass
 
 #finds the MST based on the heap passed to it along with the number of verticies.	
-def findMst(heap, forest, V):
+def findMst(heap, forest, edgesAdded, V):
 	weight = 0
 	numEdge = 0
 	#set up each node with a weight and a list to keep track of nodes.
@@ -49,29 +56,49 @@ def findMst(heap, forest, V):
 	while numEdge < V - 1:
 		safeEdge = heappop(heap)
 		print(safeEdge)
+		#if the two vertices aren't in the same component
 		if forest[safeEdge[1]][0] != forest[safeEdge[2]][0]:
 			numEdge = numEdge + 1
+			edgesAdded.append(safeEdge)
 			#label the connected components
 			reLabel(forest, safeEdge[1], safeEdge[2])
 			#add the edge to the ajacentcy list
 			addEdge(forest, safeEdge[1], safeEdge[2])
 			#add weight
 			weight = weight + safeEdge[0]
-			print(numEdge)
-			displayForest(forest)
-				
-				
-		#if both of the edges are part of a connected componet make sure they are not the same connected component.
-
 	print(weight)
-			
-			
+	
+#Lebels all the vertices in a component. Using DFS
+def dfsLabel(graph, start, label):
+	visted = set()
+	stack = [start]
+	while stack:
+		vertex = stack.pop()
+		if vertex not in visted:
+			visted.add(vertex)
+			graph[vertex] = (label, graph[vertex][1])
+			stack.extend(graph[vertex][1])
+	
+
+#Labels all the connected compontes in a graph
+def relabelComponents(forest):
+	allLebeled = False
+	dfsLabel(forest, 0, 0)
+	
+		
+
+
+
+	
 	
 graph = [line.rstrip('\n').split(',') for line in open('input.txt','r')]
 totalVetices = int(graph[0][0])
 del graph[0]
 
 forest = []
+edgesAdded = []
 heap = setUpHeap(graph)
-findMst(heap, forest,totalVetices)
+findMst(heap, forest, edgesAdded,totalVetices)
+removeEdge(forest, edgesAdded[0])
+relabelComponents(forest)
 displayForest(forest)
