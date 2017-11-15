@@ -21,19 +21,7 @@ def setUpHeap(graph):
 def reLabel(forest, edge1, edge2):
 	newLabel = 0
 	oldLabel = 0
-	if forest[edge1][0] == -1 and forest[edge2][0] == -1:
-		forest[edge1] = (edge2, forest[edge1][1])
-		forest[edge1] = (edge2, forest[edge2][1])
-		return
-	elif forest[edge1][0] == -1 or forest[edge2][0] == -1:
-		if forest[edge1][0] == -1:
-			forest[edge1] = (edge2, forest[edge1][1])
-			return
-		else:
-			forest[edge2] = (edge2, forest[edge2][1])
-			newEdge = edge2
-			oldEdge = edge1
-	elif forest[edge1][0] > forest[edge2][0]:
+	if forest[edge1][0] > forest[edge2][0]:
 		newLabel = forest[edge2][0]
 		oldLabel = forest[edge1][0]
 	else:  #forest[edge1][0] < forest[edge2][0]
@@ -57,44 +45,24 @@ def findMst(heap, forest, V):
 	#set up each node with a weight and a list to keep track of nodes.
 	if len(forest) == 0:
 		for i in  range(0, V):
-			forest.append((-1,[])) #(Vertex name, Label, Ajecentcy list)
-	while numEdge < V:
+			forest.append((i,[])) #(Label, Ajecentcy list)
+	while numEdge < V - 1:
 		safeEdge = heappop(heap)
 		print(safeEdge)
-		
-		#if neither vertex has had any edges added to them.
-		if forest[safeEdge[1]][0] < 0 and forest[safeEdge[2]][0] < 0:
-			#we are adding another edge
+		if forest[safeEdge[1]][0] != forest[safeEdge[2]][0]:
 			numEdge = numEdge + 1
-			#label the connected component when it is created
+			#label the connected components
 			reLabel(forest, safeEdge[1], safeEdge[2])
 			#add the edge to the ajacentcy list
 			addEdge(forest, safeEdge[1], safeEdge[2])
 			#add weight
 			weight = weight + safeEdge[0]
-			
-		#if one of the vertex have has not yet had any edges added to it
-		elif forest[safeEdge[1]][0] < 0 or forest[safeEdge[2]][0] < 0:
-			#we are adding another edge.
-			numEdge = numEdge + 1
-			addEdge(forest, safeEdge[1], safeEdge[2])
-			weight = weight + safeEdge[0]
-			reLabel(forest, safeEdge[1], safeEdge[2])
+			print(numEdge)
+			displayForest(forest)
 				
 				
 		#if both of the edges are part of a connected componet make sure they are not the same connected component.
-		elif forest[safeEdge[1]][0] > 0 and forest[safeEdge[2]][0] > 0:
-			#if they are not the same connected componenet connect them otherwise
-			#don't add the edge because we will create a cycle.
-			if forest[safeEdge[1]][0] != forest[safeEdge[2]][0]:
-				#here we are adding another edge
-				numEdge = numEdge + 1
-				#relabel the edges
-				reLabel(forest, safeEdge[1], safeEdge[2])
-				#add the edge
-				addEdge(forest, safeEdge[1], safeEdge[2])
-				#add the weight
-				weight = weight + safeEdge[0]
+
 	print(weight)
 			
 			
