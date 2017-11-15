@@ -84,12 +84,14 @@ def dfsLabel(graph, start, label):
 def relabelComponents(forest):
 	allLebeled = False
 	dfsLabel(forest, 0, 0)
-	
+
+#given the mst in the forest along with a list of edges in the mst
+#and the remaining edges in the heap left over from finding the mst
+#this function finds the next mst.
+def findNextMst(forest, edgesAdded, heap):
+	for i in range(0, len(edgesAdded))
+		tempEdge = edgesAdded.pop()
 		
-
-
-
-	
 	
 graph = [line.rstrip('\n').split(',') for line in open('input.txt','r')]
 totalVetices = int(graph[0][0])
@@ -101,4 +103,4 @@ heap = setUpHeap(graph)
 findMst(heap, forest, edgesAdded,totalVetices)
 removeEdge(forest, edgesAdded[0])
 relabelComponents(forest)
-displayForest(forest)
+
