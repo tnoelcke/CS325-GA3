@@ -61,7 +61,6 @@ def findMst(heap, forest, edgesAdded, V):
 		print(numEdge)
 		#if the two vertices aren't in the same component
 		if forest[safeEdge[1]][0] != forest[safeEdge[2]][0]:
-			print("SafeEdge Found")
 			edgesAdded.append(safeEdge)
 			#label the connected components
 			reLabel(forest, safeEdge[1], safeEdge[2])
@@ -89,37 +88,29 @@ def dfsLabel(graph, start, label):
 #given the mst in the forest along with a list of edges in the mst
 #and the remaining edges in the heap left over from finding the mst
 #this function finds the next mst.
-def findNextMst(forest, edgesAdded, heap, weight):
-	minWeight = 0
-	edgeAdded = []
-	tempWeight = 0
-	heapState = []
-	graphState = []
+def findNextMst(forest, edgesAdded, heap, V):
+	min = -1
+	mst2 = []
+	edges2 = []
+	heapTemp = []
+	mstHeap = []
+	
 	for i in range(0, len(edgesAdded)):
-		tempHeap = deepcopy(heap)
-		tempEdge = edgesAdded[i]
-		tempWeight = weight - tempEdge[0]
-		removeEdge(forest, tempEdge)
-		#We know there will only ever be two components we need to label so pick an edge
-		#and preform the label the other edges should already all be labeled the same thing.
-		#this will result in two unique componets.
-		dfsLabel(forest, 0, i)
-		tempEdgeAdded = []
-		temp1 = findMst(tempHeap, forest, tempEdgeAdded, 2)
-		print(temp1)
-		temp = tempWeight + temp1
-		print(temp)
-		if minWeight == 0 or minWeight > temp:
-			minWeight = temp
-			edgeAdded = tempEdgeAdded
-			heapState = deepcopy(tempHeap)
-			graphState = deepcopy(forest)
-		#set up for next iteration
-		print(tempEdge)
-		print(tempEdgeAdded)
-		addEdge(forest, tempEdge[1], tempEdge[2])
-		removeEdge(forest, tempEdgeAdded[0])
-	print(minWeight)
+		forestTemp = []
+		heapTemp = deepcopy(heap)
+		heapTemp.remove(edgesAdded[i])
+		tempEdges = []
+		temp = findMst(heapTemp, forestTemp, tempEdges, V)
+		heappush(mstHeap, temp)
+		if min == -1 or temp < min:
+			mst2 = deepcopy(forestTemp)
+			edges2 = deepcopy(tempEdges)
+			min = temp
+			print(min)
+		forest = mst2
+		edgesAdded = edges2
+	print(mstHeap)
+	return min
 	
 	
 	
@@ -135,7 +126,8 @@ heap = setUpHeap(graph)
 weight = findMst(heap, forest, edgesAdded,totalVetices)
 print("First: ", weight)
 displayForest(forest)
-findNextMst(forest, edgesAdded, heap, weight)
+heap = setUpHeap(graph)
+findNextMst(forest, edgesAdded, heap, totalVetices)
 
 
 
